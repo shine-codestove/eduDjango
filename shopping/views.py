@@ -5,32 +5,40 @@ from shopping.models import Product
 import json
 
 
+def delete_product(request):
+    product_id = request.GET.get('id')
+    p = Product.objects.get(id=product_id)
+    p.is_active = False
+
+    p.save()
+
+    return HttpResponse('delete success')
+
+
 def update_product(request):
-    pass
+    product_id = request.GET.get('id')
+    p = Product.objects.get(id=product_id)
+    _data = json.loads(request.body)
+    p.size = _data['size']
+    p.price = _data['price']
+    p.save()
+    return HttpResponse('update success')
 
 
 @transaction.atomic()
 def create_product(request):
     body = json.loads(request.body)
-    # _name = body['name']
+    _name = body['name']
     _size = body['size']
     _price = body['price']
     _weight = body['weight']
     _image_url = body['image_url']
     _category = body['category']
 
-    product = Product(size=_size, price=_price, weight=_weight, image_url=_image_url, category=_category)
+    product = Product(name=_name, size=_size, price=_price, weight=_weight, image_url=_image_url, category=_category)
     product.save()
 
     return HttpResponse('success')
-
-
-# def create(request):
-#     data = request.body
-#     _weight = int(data.weight) * 100
-#     p = Product(name=data.name, price=data.amount, size=data.size, weight=_weight)
-#     p.save()
-#     return JsonResponse({"data": {"name": p.name}})
 
 
 def list_product(request):
